@@ -1,0 +1,29 @@
+{
+  "activation_dropout": 0.0,
+  "activation_function": "relu",
+  "architectures": [
+    "VLMOCRForConditionalGenerationNew"
+  ],
+  "attention_dropout": 0.1,
+  "bos_token_id": 0,
+  "d_model": 768,
+  "decoder_attention_heads": 6,
+  "decoder_ffn_dim": 3072,
+  "decoder_layerdrop": 0.0,
+  "decoder_layers": 6,
+  "decoder_start_token_id": 0,
+  "encoder_layerdrop": 0.0,
+  "eos_token_id": 2,
+  "init_std": 0.02,
+  "is_encoder_decoder": true,
+  "max_position_embeddings": 3072,
+  "model_type": "m2m_100",
+  "pad_token_id": 1,
+  "scale_embedding": true,
+  "torch_dtype": "float32",
+  "transformers_version": "4.49.0",
+  "use_cache": true,
+  "vocab_size": 56371,
+  "max_length": 2048,
+  "label_smoothing": 0.1
+}

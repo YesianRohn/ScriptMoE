@@ -1,0 +1,15 @@
+# --- Recognition (ScriptMoE, PyTorch) ---
+torch>=2.0
+torchvision
+safetensors
+numpy
+opencv-python-headless
+Pillow
+
+# --- Detection ---
+# openocr detector (--det openocr, default)
+openocr-python
+
+# PaddleOCR detectors (--det ppv5 / ppv6); install only if you use them
+# paddleocr
+# paddlepaddle        # or paddlepaddle-gpu
