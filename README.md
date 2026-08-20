@@ -12,6 +12,7 @@ ScriptMoE/
 │   ├── visualize.py      #   Text-box cropping / visualization
 │   ├── model.safetensors #   Recognizer weights
 │   └── assets/dict.txt   #   Multilingual character dictionary
+├── eval_textmussbench    # STR evaluation script on the TextMuSS-Bench
 ├── run_cc_ocr_mlt.py     # End-to-end evaluation script on the CC-OCR-MLT dataset
 ├── CC-OCR-MLT/           # Test dataset & official evaluator
 │   ├── tsv/              #   10 languages, <Lang>_150.tsv (base64 images + GT)
@@ -25,6 +26,7 @@ Roles of the four modules:
 |--------|---------|
 | `OpenOCR/` | **Training**: train the ScriptMoE recognizer with the OpenOCR framework |
 | `E2EOCR/` | **Deployment/Inference**: detector + ScriptMoE recognizer pipeline for arbitrary images |
+| `eval_textmussbench/` | **Evaluator**: official evaluation code on VLMs and general OCR systems|
 | `run_cc_ocr_mlt.py` | **Evaluation**: run the end-to-end pipeline on CC-OCR-MLT and compute metrics |
 | `CC-OCR-MLT/` | **Data/Evaluator**: test-set TSVs + official evaluation code |
 
