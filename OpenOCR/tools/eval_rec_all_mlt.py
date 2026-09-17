@@ -51,40 +51,6 @@ def main():
         trainer.logger.info('{}:{}'.format(k, v))
 
     data_dirs_list = [
-        [
-      '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/MLT-Bench/Arabic',
-      '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/MLT-Bench/Bangla',
-      '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/MLT-Bench/Chinese',
-      '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/MLT-Bench/Hindi',
-      '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/MLT-Bench/Japanese',
-      '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/MLT-Bench/Korean',
-      '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/MLT-Bench/Latin',
-      '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/MLT-Bench/Russian',
-      '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/MLT-Bench/Thai',
-      '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/MLT-Bench/Tibetan',
-    ],
-                [
-    '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/UnionMLT-Bench/Artistic',
-    '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/UnionMLT-Bench/Contextless',
-    '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/UnionMLT-Bench/Curve',
-    '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/UnionMLT-Bench/Degraded',
-    '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/UnionMLT-Bench/Incomplete',
-    '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/UnionMLT-Bench/Multi-Oriented',
-    '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/UnionMLT-Bench/Multi-Words',
-    '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/UnionMLT-Bench/Perspective',
-    '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/UnionMLT-Bench/General',
-    ],
-    [
-        '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/benchmark_bctr_v2/test/document_test',
-        '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/benchmark_bctr_v2/test/handwriting_test',
-        '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/benchmark_bctr_v2/test/scene_test',
-        '/mnt/chongqinggeminiceph1fs/geminicephfs/mm-base-vision/seasonye/UnionST/benchmark_bctr_v2/test/web_test',
-    ],
-        [
-            '/mnt/chongqinggeminiceph2fs/geminicephfs/mm-base-vision/seasonye/ocr-test/u14m-test/curve/', '/mnt/chongqinggeminiceph2fs/geminicephfs/mm-base-vision/seasonye/ocr-test/u14m-test/multi_oriented/', '/mnt/chongqinggeminiceph2fs/geminicephfs/mm-base-vision/seasonye/ocr-test/u14m-test/artistic/',
-            '/mnt/chongqinggeminiceph2fs/geminicephfs/mm-base-vision/seasonye/ocr-test/u14m-test/contextless/', '/mnt/chongqinggeminiceph2fs/geminicephfs/mm-base-vision/seasonye/ocr-test/u14m-test/salient/', '/mnt/chongqinggeminiceph2fs/geminicephfs/mm-base-vision/seasonye/ocr-test/u14m-test/multi_words/',
-            '/mnt/chongqinggeminiceph2fs/geminicephfs/mm-base-vision/seasonye/ocr-test/u14m-test/general/'
-        ],
     ]
     cfg = cfg.cfg
     file_csv = open(
