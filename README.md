@@ -16,26 +16,6 @@
 
 **Xingsong Ye, Yongkun Du, Jiaxin Zhang, Zhixian Li, Chong Sun, Chen Li, Jing Lyu, Lianwen Jin, Zhineng Chen**
 
-[Paper](https://arxiv.org/abs/2609.24058) ·
-[Hugging Face Paper](https://huggingface.co/papers/2609.24058) ·
-[Demo](https://huggingface.co/spaces/Yesianrohn/MultilingualOCR-Demo) ·
-[TextMuSS-10M](https://huggingface.co/datasets/Yesianrohn/TextMuSS-10M) ·
-[TextMuSS-Bench](https://huggingface.co/datasets/Yesianrohn/TextMuSS-Bench)
-
----
-
-## Overview
-
-Multilingual scene text recognition (STR) remains challenging because real-world training data is highly imbalanced across languages and scripts. Existing approaches either maintain separate recognizers for different languages or rely on large vision-language models, resulting in increased deployment cost and/or limited recognition accuracy on many scripts.
-
-We propose **ScriptMoE**, an all-in-one multilingual scene text recognizer based on a **script-aware sparse Mixture-of-Experts (MoE)** architecture.
-
-The key idea is to share a single visual encoder while replacing the dense decoder with a sparse MoE decoder. An image-level router dispatches each input to the **top-2 script-aligned experts**, together with a **shared expert** that captures cross-script knowledge.
-
-To provide balanced supervision for multilingual recognition, we also construct **TextMuSS-10M**, a large-scale synthetic scene text dataset covering **10 scripts and 229 languages**, with approximately **1M synthetic samples per script**.
-
-For evaluation, we introduce **TextMuSS-Bench**, a multilingual scene text recognition benchmark covering **10 scripts and 10,899 real-world images**.
-
 ---
 
 ## Highlights
@@ -303,39 +283,6 @@ max_ratio = 20
 
 ---
 
-## TextMuSS-10M
-
-**TextMuSS-10M** is the large-scale synthetic training dataset introduced in this work.
-
-It contains synthetic multilingual scene text covering:
-
-- **10 writing scripts**
-- **229 languages**
-- approximately **1M samples per script**
-
-The dataset is designed to provide balanced multilingual supervision, particularly for languages and scripts with limited real-world scene-text training data.
-
-🤗 **Dataset:**  
-https://huggingface.co/datasets/Yesianrohn/TextMuSS-10M
-
----
-
-## TextMuSS-Bench
-
-**TextMuSS-Bench** is the multilingual scene text recognition benchmark introduced in this work.
-
-It covers:
-
-- **10 writing scripts**
-- **10,899 real-world images**
-- multilingual scene text recognition evaluation
-
-The benchmark extends multilingual STR evaluation with additional real-world data for scripts including Russian, Thai, and Tibetan.
-
-🤗 **Dataset:**  
-https://huggingface.co/datasets/Yesianrohn/TextMuSS-Bench
-
----
 
 ## Evaluation
 
@@ -406,27 +353,6 @@ Replacing the recognizer in PP-OCRv5 with ScriptMoE gives:
 | PP-OCRv5 MLT | 78.58 | 76.13 | 49.67 | 65.71 |
 | Qwen2.5-VL-72B | 85.36 | 76.27 | 71.09 | 79.68 |
 | **PP-OCRv5 Det + ScriptMoE** | **92.33** | **89.43** | **79.22** | **80.89** |
-
----
-
-## Demo
-
-Try ScriptMoE directly in your browser:
-
-👉 **[Multilingual OCR Demo](https://huggingface.co/spaces/Yesianrohn/MultilingualOCR-Demo)**
-
-The demo provides an interactive interface for multilingual scene text recognition.
-
----
-
-## Paper
-
-**All-in-One Multilingual Scene Text Recognition with Script-aware Mixture-of-Experts**
-
-Xingsong Ye, Yongkun Du, Jiaxin Zhang, Zhixian Li, Chong Sun, Chen Li, Jing Lyu, Lianwen Jin, Zhineng Chen.
-
-- [arXiv:2609.24058](https://arxiv.org/abs/2609.24058)
-- [Hugging Face Paper](https://huggingface.co/papers/2609.24058)
 
 ---
 
