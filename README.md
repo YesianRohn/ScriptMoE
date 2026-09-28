@@ -1,192 +1,458 @@
-# All-in-One Multilingual Scene Text Recognition with Script-aware Mixture-of-Experts
+# ScriptMoE: All-in-One Multilingual Scene Text Recognition with Script-aware Mixture-of-Experts
+
+<p align="center">
+  <h3 align="center">All-in-One Multilingual Scene Text Recognition with Script-aware Mixture-of-Experts</h3>
+</p>
+
+<p align="center">
+  <a href="https://arxiv.org/abs/2609.24058">
+    <img src="https://img.shields.io/badge/arXiv-2609.24058-b31b1b.svg" alt="arXiv">
+  </a>
+  <a href="https://huggingface.co/papers/2609.24058">
+    <img src="https://img.shields.io/badge/Hugging%20Face-Paper-ffcc00.svg" alt="Hugging Face Paper">
+  </a>
+  <a href="https://huggingface.co/spaces/Yesianrohn/MultilingualOCR-Demo">
+    <img src="https://img.shields.io/badge/%F0%9F%A4%97-Demo-yellow.svg" alt="Demo">
+  </a>
+</p>
+
+This repository contains the official implementation and evaluation code for:
+
+> **All-in-One Multilingual Scene Text Recognition with Script-aware Mixture-of-Experts**
+
+**Xingsong Ye, Yongkun Du, Jiaxin Zhang, Zhixian Li, Chong Sun, Chen Li, Jing Lyu, Lianwen Jin, Zhineng Chen**
+
+[Paper](https://arxiv.org/abs/2609.24058) ·
+[Hugging Face Paper](https://huggingface.co/papers/2609.24058) ·
+[Demo](https://huggingface.co/spaces/Yesianrohn/MultilingualOCR-Demo) ·
+[TextMuSS-10M](https://huggingface.co/datasets/Yesianrohn/TextMuSS-10M) ·
+[TextMuSS-Bench](https://huggingface.co/datasets/Yesianrohn/TextMuSS-Bench)
+
+---
+
+## Overview
+
+Multilingual scene text recognition (STR) remains challenging because real-world training data is highly imbalanced across languages and scripts. Existing approaches either maintain separate recognizers for different languages or rely on large vision-language models, resulting in increased deployment cost and/or limited recognition accuracy on many scripts.
+
+We propose **ScriptMoE**, an all-in-one multilingual scene text recognizer based on a **script-aware sparse Mixture-of-Experts (MoE)** architecture.
+
+The key idea is to share a single visual encoder while replacing the dense decoder with a sparse MoE decoder. An image-level router dispatches each input to the **top-2 script-aligned experts**, together with a **shared expert** that captures cross-script knowledge.
+
+To provide balanced supervision for multilingual recognition, we also construct **TextMuSS-10M**, a large-scale synthetic scene text dataset covering **10 scripts and 229 languages**, with approximately **1M synthetic samples per script**.
+
+For evaluation, we introduce **TextMuSS-Bench**, a multilingual scene text recognition benchmark covering **10 scripts and 10,899 real-world images**.
+
+---
+
+## Highlights
+
+- 🌍 **All-in-one multilingual STR** across 10 writing scripts and 229 languages.
+- 🧩 **Script-aware Mixture-of-Experts** with top-2 script-aligned routing.
+- 🔗 **Shared expert** for cross-script knowledge transfer.
+- 🏗️ **Single visual encoder** shared across all scripts.
+- 🧪 **TextMuSS-10M**: 10 scripts, 229 languages, 1M synthetic samples per script.
+- 📊 **TextMuSS-Bench**: 10 scripts and 10,899 real images.
+- 🚀 **End-to-end OCR** integration with PP-OCRv5.
+- 🔬 Complete training, inference, and evaluation code is provided in this repository.
+
+---
+
+## Resources
+
+| Resource | Description |
+|---|---|
+| 📄 [Paper](https://arxiv.org/abs/2609.24058) | Research paper on arXiv |
+| 🤗 [Hugging Face Paper](https://huggingface.co/papers/2609.24058) | Hugging Face paper page |
+| 💻 [Code](https://github.com/YesianRohn/ScriptMoE) | Official implementation |
+| 🚀 [Demo](https://huggingface.co/spaces/Yesianrohn/MultilingualOCR-Demo) | Interactive multilingual OCR demo |
+| 🧪 [TextMuSS-10M](https://huggingface.co/datasets/Yesianrohn/TextMuSS-10M) | Large-scale synthetic training dataset |
+| 📊 [TextMuSS-Bench](https://huggingface.co/datasets/Yesianrohn/TextMuSS-Bench) | Multilingual STR benchmark |
+
+---
+
+## Method
+
+ScriptMoE consists of a shared visual encoder followed by a sparse script-aware MoE decoder.
+
+Given an input text image, an image-level router predicts the relevant scripts and dispatches the input to the **top-2 script-aligned experts**. A shared expert is additionally used to absorb knowledge shared across different writing systems.
+
+Conceptually:
+
+```text
+                 Input Image
+                     │
+                     ▼
+          ┌─────────────────────┐
+          │ Shared Visual       │
+          │ Encoder (SVTRv2)    │
+          └──────────┬──────────┘
+                     │
+                     ▼
+             Image-level Router
+                     │
+          ┌──────────┼──────────┐
+          │          │          │
+          ▼          ▼          ▼
+       Expert 1   Expert 2   Shared Expert
+       Script-A   Script-B   Cross-script
+          │          │          │
+          └──────────┼──────────┘
+                     │
+                     ▼
+             Sparse MoE Decoder
+                     │
+                     ▼
+              Recognized Text
+```
+
+---
 
 ## Directory Structure
 
-```
+```text
 ScriptMoE/
-├── OpenOCR/              # Training code (OpenOCR framework; ScriptMoE model/loss/postprocess)
-├── E2EOCR/               # End-to-end deployment & inference (detector + ScriptMoE recognizer, self-contained)
-│   ├── infer.py          #   End-to-end inference CLI (detection + recognition)
-│   ├── modeling.py       #   Self-contained PyTorch model (SVTRv2 + ScriptMoE decoder)
-│   ├── postprocess.py    #   AR label decoding
-│   ├── visualize.py      #   Text-box cropping / visualization
-│   ├── model.safetensors #   Recognizer weights
-│   └── assets/dict.txt   #   Multilingual character dictionary
-├── eval_textmussbench    # STR evaluation script on the TextMuSS-Bench
-├── run_cc_ocr_mlt.py     # End-to-end evaluation script on the CC-OCR-MLT dataset
-├── CC-OCR-MLT/           # Test dataset & official evaluator
-│   ├── tsv/              #   10 languages, <Lang>_150.tsv (base64 images + GT)
-│   └── eval/             #   Official evaluator (main.py + evaluator/)
+├── OpenOCR/
+│   ├── configs/
+│   │   └── rec/
+│   │       └── scriptmoe/
+│   │           └── svtrv2_scriptmoe_mlt.yml
+│   └── openrec/
+│       ├── modeling/
+│       ├── losses/
+│       └── postprocess/
+│
+├── E2EOCR/
+│   ├── infer.py
+│   ├── modeling.py
+│   ├── postprocess.py
+│   ├── visualize.py
+│   ├── model.safetensors
+│   └── assets/
+│       └── dict.txt
+│
+├── eval_textmussbench/
+├── Eval-TextMuSS-Bench/
+├── CC-OCR-MLT/
+├── run_cc_ocr_mlt.py
 └── README.md
 ```
 
-Roles of the four modules:
+### Main components
 
 | Module | Purpose |
-|--------|---------|
-| `OpenOCR/` | **Training**: train the ScriptMoE recognizer with the OpenOCR framework |
-| `E2EOCR/` | **Deployment/Inference**: detector + ScriptMoE recognizer pipeline for arbitrary images |
-| `eval_textmussbench/` | **Evaluator**: official evaluation code on VLMs and general OCR systems|
-| `run_cc_ocr_mlt.py` | **Evaluation**: run the end-to-end pipeline on CC-OCR-MLT and compute metrics |
-| `CC-OCR-MLT/` | **Data/Evaluator**: test-set TSVs + official evaluation code |
+|---|---|
+| `OpenOCR/` | Training code and ScriptMoE implementation |
+| `E2EOCR/` | Self-contained end-to-end inference pipeline |
+| `eval_textmussbench/` | TextMuSS-Bench evaluation |
+| `Eval-TextMuSS-Bench/` | Evaluation utilities |
+| `run_cc_ocr_mlt.py` | End-to-end CC-OCR-MLT evaluation |
+| `CC-OCR-MLT/` | CC-OCR-MLT test data and official evaluator |
 
 ---
-
 
 ## Installation
 
-```bash
-# Recognizer + end-to-end inference dependencies
-cd E2EOCR
-pip install -r requirements.txt
+### End-to-end inference
 
-# Training dependencies (OpenOCR framework)
-cd ../OpenOCR
+```bash
+cd E2EOCR
 pip install -r requirements.txt
 ```
 
-Core dependencies: `torch>=2.0`, `torchvision`, `safetensors`, `opencv-python`, `Pillow`.
+Core dependencies include:
 
-Detectors are optional; install as needed:
-- `openocr` (default): `pip install openocr-python`
-- `ppv5` / `ppv6`: `pip install "paddleocr>=3.7.0" paddlepaddle` (PP-OCRv6 requires `paddleocr>=3.7.0`)
+```text
+torch >= 2.0
+torchvision
+safetensors
+opencv-python
+Pillow
+```
+
+Optional detectors:
+
+```bash
+# OpenOCR detector
+pip install openocr-python
+
+# PP-OCRv5 / PP-OCRv6
+pip install "paddleocr>=3.7.0" paddlepaddle
+```
+
+### Training
+
+```bash
+cd OpenOCR
+pip install -r requirements.txt
+```
 
 ---
 
-## 1. End-to-End Inference (E2EOCR)
+## End-to-End Inference
 
-Run "detection + ScriptMoE recognition" on a single image or a whole directory. The recognizer weights (`model.safetensors`) and dictionary (`assets/dict.txt`) are shipped in the folder.
+The `E2EOCR/` directory provides a self-contained inference pipeline consisting of text detection followed by ScriptMoE recognition.
+
+The recognizer weights and multilingual character dictionary are already included.
+
+### Single image
 
 ```bash
 cd E2EOCR
 
-# Default: openocr detector
-python infer.py --image path/to/img.jpg
-
-# PP-OCRv5 detector
-python infer.py --image path/to/img.jpg --det ppv5
-
-# Recognize the whole image only (no detection; for pre-cropped text lines)
-python infer.py --image path/to/crop.jpg --det rec_only
-
-# Batch a directory and write JSON
-python infer.py --image path/to/dir --output out.json
+python infer.py --image path/to/image.jpg
 ```
 
-Common arguments:
+### PP-OCRv5 detector
+
+```bash
+python infer.py \
+    --image path/to/image.jpg \
+    --det ppv5
+```
+
+### Recognition only
+
+For an already cropped text line:
+
+```bash
+python infer.py \
+    --image path/to/crop.jpg \
+    --det rec_only
+```
+
+### Batch inference
+
+```bash
+python infer.py \
+    --image path/to/image_directory \
+    --output out.json
+```
+
+### Main arguments
 
 | Argument | Default | Description |
-|----------|---------|-------------|
-| `--det` | `openocr` | Detector: `openocr` / `ppv5` / `ppv6` / `rec_only` |
-| `--drop_score` | `0.5` | Drop boxes whose recognition score is below this value |
+|---|---:|---|
+| `--det` | `openocr` | Detector: `openocr`, `ppv5`, `ppv6`, or `rec_only` |
+| `--drop_score` | `0.5` | Remove recognition results below this score |
 | `--rec_batch_num` | `8` | Recognition batch size |
-| `--use_gpu` | `auto` | `auto` / `true` / `false` |
-| `--max_ratio` | `20` | Max width/height ratio for the recognizer |
-
-> Note: the recognizer weights, dictionary, and detector mode (server) are hard-coded in the script; no CLI flags are needed for them.
+| `--use_gpu` | `auto` | `auto`, `true`, or `false` |
+| `--max_ratio` | `20` | Maximum width/height ratio |
 
 ---
 
-## 2. CC-OCR-MLT End-to-End Evaluation (run_cc_ocr_mlt.py)
+## Training
 
-Run the end-to-end pipeline on the CC-OCR multilingual benchmark (10 languages, 150 images each) and invoke the official evaluator to report F1.
+Training is implemented on top of the OpenOCR framework.
 
-Pipeline: read local `CC-OCR-MLT/tsv/<Lang>_150.tsv` → decode base64 images → E2EOCR inference → filter boxes by `det_thresh` / `rec_thresh` → concatenate the response → write GT and prediction JSONs → call `CC-OCR-MLT/eval/main.py` to produce `summary.md`.
+The main ScriptMoE configuration is:
 
-```bash
-cd ScriptMoE
-
-# Reproduce the paper's end-to-end setting: PP-OCRv5 detector + det_thresh=0.0 / rec_thresh=0.7
-python run_cc_ocr_mlt.py --det ppv5 --det_thresh 0.0 --rec_thresh 0.7
-
-# A subset of languages / limited count (for debugging)
-python run_cc_ocr_mlt.py --det ppv5 --languages Korean Japanese --max_per_lang 20
-
-# Inference only, no evaluation
-python run_cc_ocr_mlt.py --det ppv5 --no_eval
+```text
+OpenOCR/configs/rec/scriptmoe/svtrv2_scriptmoe_mlt.yml
 ```
 
-Common arguments:
+Important implementation files include:
 
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `--det` | `openocr` | Detector; use `ppv5` to reproduce the paper |
-| `--det_thresh` | `0.0` | Detection score threshold |
-| `--rec_thresh` | `0.7` | Recognition score threshold |
-| `--languages` | all 10 | Subset of languages |
-| `--max_per_lang` | `150` | Max images per language |
-| `--work_dir` | `./cc_ocr_eval` | Output root directory |
-| `--exp_name` | auto `det_d<thr>_r<thr>` | Experiment name |
-| `--no_eval` | off | Inference only, no evaluation |
-| `--show_pred` | off | Also print predicted text in progress logs |
+```text
+OpenOCR/openrec/modeling/decoders/scriptmoe_decoder.py
+OpenOCR/openrec/losses/scriptmoe_loss.py
+OpenOCR/openrec/postprocess/scriptmoe_postprocess.py
+OpenOCR/openrec/modeling/encoders/svtrv2_lnconv_two33.py
+```
 
-Results are written to `cc_ocr_eval/summary.md` and a `status.json` under each experiment directory.
+Before training, update the training and validation dataset paths in:
 
----
+```yaml
+Train.dataset.data_dir_list
+Eval.dataset.data_dir_list
+```
 
-## 3. Training (OpenOCR)
-
-Training is built on the `OpenOCR/` framework. The ScriptMoE config lives at `OpenOCR/configs/rec/scriptmoe/svtrv2_scriptmoe_mlt.yml`, and the relevant implementation files are:
-
-- Model: `OpenOCR/openrec/modeling/decoders/scriptmoe_decoder.py`
-- Loss: `OpenOCR/openrec/losses/scriptmoe_loss.py`
-- Postprocess: `OpenOCR/openrec/postprocess/scriptmoe_postprocess.py`
-- Encoder: `OpenOCR/openrec/modeling/encoders/svtrv2_lnconv_two33.py`
+### Example
 
 ```bash
 cd OpenOCR
 
-# Single-node multi-GPU training (example; adjust GPU count and port as needed)
-python -m torch.distributed.launch --nproc_per_node=8 \
-    tools/train_rec.py --c configs/rec/scriptmoe/svtrv2_scriptmoe_mlt.yml
+python -m torch.distributed.launch \
+    --nproc_per_node=8 \
+    tools/train_rec.py \
+    --c configs/rec/scriptmoe/svtrv2_scriptmoe_mlt.yml
 ```
 
-Before training, fill in the training/validation dataset paths in the yml (`Train.dataset.data_dir_list` / `Eval.dataset.data_dir_list`).
+### Training recipe
 
-**Key configuration (aligned with the paper)**:
+The main training recipe follows the paper:
 
-| Item | STR setting | End-to-end setting |
-|------|-------------|--------------------|
-| `max_text_length` | 25 | 100 |
-| `max_ratio` | 8 | 20 |
+| Setting | Value |
+|---|---|
+| Optimizer | AdamW |
+| Weight decay | 0.05 |
+| Peak learning rate | `6.5e-4` |
+| Global batch size | 1024 |
+| GPUs | 8 × 128 |
+| Scheduler | OneCycleLR |
+| Warmup | 1.5 epochs |
+| Total training | 2 epochs |
+| Label smoothing | 0.1 |
 
-**Training recipe** (paper appendix): AdamW (weight decay 0.05), peak learning rate `6.5e-4`, global batch size 1024 (8×128), OneCycleLR with a 1.5-epoch linear warmup, 2 epochs total; label smoothing 0.1. The end-to-end variant is re-trained with `max_text_length=100` to handle line-level inputs.
+For standard STR evaluation:
+
+```text
+max_text_length = 25
+max_ratio = 8
+```
+
+For end-to-end recognition:
+
+```text
+max_text_length = 100
+max_ratio = 20
+```
 
 ---
 
-## Datasets
+## TextMuSS-10M
 
-- **Training**: real English/Chinese data (Union14M, BCTR) + a small amount of real multilingual data (MLT2019) + large-scale synthetic data **TextMuSS-10M** (10 scripts, 229 languages, 1M per script).
-- **STR evaluation**: **TextMuSS-Bench** (extends MLT2019 with newly collected Russian / Thai / Tibetan; 10,899 real images total).
-- **End-to-end evaluation**: CC-OCR multilingual task; this repo ships `CC-OCR-MLT/tsv/` with 150 images per language for 10 languages.
+**TextMuSS-10M** is the large-scale synthetic training dataset introduced in this work.
+
+It contains synthetic multilingual scene text covering:
+
+- **10 writing scripts**
+- **229 languages**
+- approximately **1M samples per script**
+
+The dataset is designed to provide balanced multilingual supervision, particularly for languages and scripts with limited real-world scene-text training data.
+
+🤗 **Dataset:**  
+https://huggingface.co/datasets/Yesianrohn/TextMuSS-10M
 
 ---
 
-## Results at a Glance
+## TextMuSS-Bench
 
-**TextMuSS-Bench (per-script word accuracy %, excerpt)**
+**TextMuSS-Bench** is the multilingual scene text recognition benchmark introduced in this work.
 
-| Method | Arabic | Chinese | Japanese | Korean | Thai | Tibetan | Avg |
-|--------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+It covers:
+
+- **10 writing scripts**
+- **10,899 real-world images**
+- multilingual scene text recognition evaluation
+
+The benchmark extends multilingual STR evaluation with additional real-world data for scripts including Russian, Thai, and Tibetan.
+
+🤗 **Dataset:**  
+https://huggingface.co/datasets/Yesianrohn/TextMuSS-Bench
+
+---
+
+## Evaluation
+
+### TextMuSS-Bench
+
+The repository provides evaluation code for TextMuSS-Bench.
+
+```bash
+python eval_textmussbench/xxx.py
+```
+
+Please refer to the scripts under:
+
+```text
+eval_textmussbench/
+Eval-TextMuSS-Bench/
+```
+
+for the corresponding evaluation settings.
+
+### CC-OCR-MLT
+
+To reproduce the end-to-end evaluation reported in the paper:
+
+```bash
+python run_cc_ocr_mlt.py \
+    --det ppv5 \
+    --det_thresh 0.0 \
+    --rec_thresh 0.7
+```
+
+For a smaller subset:
+
+```bash
+python run_cc_ocr_mlt.py \
+    --det ppv5 \
+    --languages Korean Japanese \
+    --max_per_lang 20
+```
+
+Inference without evaluation:
+
+```bash
+python run_cc_ocr_mlt.py \
+    --det ppv5 \
+    --no_eval
+```
+
+---
+
+## Results
+
+### TextMuSS-Bench
+
+ScriptMoE achieves **82.06% average word accuracy** on TextMuSS-Bench.
+
+| Method | Arabic | Chinese | Japanese | Korean | Thai | Tibetan | Avg. |
+|---|---:|---:|---:|---:|---:|---:|---:|
 | SVTRv2-AR | 75.11 | 94.15 | 69.36 | 85.86 | 69.60 | 86.80 | 80.75 |
 | **ScriptMoE** | **78.09** | **95.38** | **71.21** | **87.19** | **72.00** | **88.76** | **82.06** |
 
-**CC-OCR end-to-end (F1 %, excerpt)**
+### CC-OCR End-to-End
 
-| Method | Korean | Japanese | Russian | Total |
-|--------|:---:|:---:|:---:|:---:|
+Replacing the recognizer in PP-OCRv5 with ScriptMoE gives:
+
+| Method | Korean | Japanese | Russian | Total F1 |
+|---|---:|---:|---:|---:|
 | PP-OCRv5 MLT | 78.58 | 76.13 | 49.67 | 65.71 |
 | Qwen2.5-VL-72B | 85.36 | 76.27 | 71.09 | 79.68 |
 | **PP-OCRv5 Det + ScriptMoE** | **92.33** | **89.43** | **79.22** | **80.89** |
 
 ---
 
+## Demo
+
+Try ScriptMoE directly in your browser:
+
+👉 **[Multilingual OCR Demo](https://huggingface.co/spaces/Yesianrohn/MultilingualOCR-Demo)**
+
+The demo provides an interactive interface for multilingual scene text recognition.
+
+---
+
+## Paper
+
+**All-in-One Multilingual Scene Text Recognition with Script-aware Mixture-of-Experts**
+
+Xingsong Ye, Yongkun Du, Jiaxin Zhang, Zhixian Li, Chong Sun, Chen Li, Jing Lyu, Lianwen Jin, Zhineng Chen.
+
+- [arXiv:2609.24058](https://arxiv.org/abs/2609.24058)
+- [Hugging Face Paper](https://huggingface.co/papers/2609.24058)
+
+---
+
 ## Citation
 
+If you find ScriptMoE, TextMuSS-10M, or TextMuSS-Bench useful in your research, please cite:
+
 ```bibtex
-@inproceedings{scriptmoe,
-  title  = {All-in-One Multilingual Scene Text Recognition with Script-aware Mixture-of-Experts},
-  author = {Anonymous},
-  year   = {2026}
+@article{ye2026scriptmoe,
+  title   = {All-in-One Multilingual Scene Text Recognition with Script-aware Mixture-of-Experts},
+  author  = {Ye, Xingsong and Du, Yongkun and Zhang, Jiaxin and Li, Zhixian and Sun, Chong and Li, Chen and Lyu, Jing and Jin, Lianwen and Chen, Zhineng},
+  journal = {arXiv preprint arXiv:2609.24058},
+  year    = {2026}
 }
 ```
+
+---
+
+## License
+
+The code in this repository is released under the license specified in the repository.
+
+Please check the licenses of the individual datasets and third-party components before redistribution or commercial use.
