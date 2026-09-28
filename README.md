@@ -1,5 +1,3 @@
-# ScriptMoE: All-in-One Multilingual Scene Text Recognition with Script-aware Mixture-of-Experts
-
 <p align="center">
   <h3 align="center">All-in-One Multilingual Scene Text Recognition with Script-aware Mixture-of-Experts</h3>
 </p>
@@ -15,10 +13,6 @@
     <img src="https://img.shields.io/badge/%F0%9F%A4%97-Demo-yellow.svg" alt="Demo">
   </a>
 </p>
-
-This repository contains the official implementation and evaluation code for:
-
-> **All-in-One Multilingual Scene Text Recognition with Script-aware Mixture-of-Experts**
 
 **Xingsong Ye, Yongkun Du, Jiaxin Zhang, Zhixian Li, Chong Sun, Chen Li, Jing Lyu, Lianwen Jin, Zhineng Chen**
 
